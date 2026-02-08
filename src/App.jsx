@@ -1,189 +1,214 @@
 import { useState, useEffect } from 'react'
 import Header from './components/Header'
-import MarketOverview from './components/MarketOverview'
-import StockList from './components/StockList'
+import BottomNav from './components/BottomNav'
+import StockCard from './components/StockCard'
 import StockChart from './components/StockChart'
 import { getStockQuote, getStockDailyData, getCompanyOverview, searchStocks } from './utils/stockApi'
 import { useWatchlist } from './hooks/useWatchlist'
 import './App.css'
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState('home') // 'home' | 'detail' | 'watchlist'
+  const [currentTab, setCurrentTab] = useState('home')
   const [selectedStock, setSelectedStock] = useState(null)
-  const [topGainers, setTopGainers] = useState([])
-  const [topLosers, setTopLosers] = useState([])
-  const [detailData, setDetailData] = useState(null)
+  const [trendingStocks, setTrendingStocks] = useState([])
   const [dailyData, setDailyData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const { watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist, toggleWatchlist } = useWatchlist()
+  const [searchInput, setSearchInput] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const { watchlist, toggleWatchlist, isInWatchlist } = useWatchlist()
 
-  // Load top gainers/losers on mount
+  // Load trending stocks on mount
   useEffect(() => {
-    loadInitialData()
+    loadTrendingStocks()
   }, [])
 
-  const loadInitialData = async () => {
+  const loadTrendingStocks = async () => {
     try {
-      setLoading(true)
-      // Mock data for top gainers/losers (in real app, would fetch from API)
-      const gainers = [
+      const stocks = [
         { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 875.50, changeAmount: 25.50, changePercent: 3.00, volume: 42500000 },
         { symbol: 'MSFT', name: 'Microsoft Corporation', price: 380.90, changeAmount: 11.50, changePercent: 3.11, volume: 28300000 },
         { symbol: 'AAPL', name: 'Apple Inc.', price: 245.50, changeAmount: 6.00, changePercent: 2.50, volume: 52500000 },
-      ]
-      const losers = [
-        { symbol: 'META', name: 'Meta Platforms', price: 480.20, changeAmount: -15.30, changePercent: -3.08, volume: 22100000 },
-        { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 156.20, changeAmount: -2.05, changePercent: -1.30, volume: 31400000 },
+        { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 156.20, changeAmount: 2.05, changePercent: 1.33, volume: 31400000 },
         { symbol: 'TSLA', name: 'Tesla Inc.', price: 242.80, changeAmount: -8.50, changePercent: -3.39, volume: 125600000 },
       ]
-      setTopGainers(gainers)
-      setTopLosers(losers)
+      setTrendingStocks(stocks)
     } catch (err) {
       setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSearch = async (symbol) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const quote = await getStockQuote(symbol)
-      const daily = await getStockDailyData(symbol)
-      const overview = await getCompanyOverview(symbol)
-      
-      setDetailData({
-        ...quote,
-        ...overview,
-      })
-      setDailyData(daily)
-      setSelectedStock(quote)
-      setCurrentScreen('detail')
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
     }
   }
 
   const handleStockClick = async (stock) => {
-    await handleSearch(stock.symbol)
+    try {
+      setLoading(true)
+      const quote = await getStockQuote(stock.symbol)
+      const daily = await getStockDailyData(stock.symbol)
+      setSelectedStock(quote)
+      setDailyData(daily)
+      setCurrentTab('detail')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleWatchlistToggle = (symbol) => {
-    toggleWatchlist(symbol)
+  const handleSearch = async () => {
+    if (!searchInput.trim()) return
+    try {
+      setLoading(true)
+      const results = await searchStocks(searchInput)
+      setSearchResults(results.map(r => ({
+        symbol: r.symbol,
+        name: r.name,
+        price: 0,
+        changeAmount: 0,
+        changePercent: 0,
+        volume: 0
+      })))
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const renderHome = () => (
     <div className="home-screen">
-      <MarketOverview marketData={{ advancing: '78.2%', declining: '18.4%', newHighs: '68.6%' }} />
-      
-      <StockList
-        title="📈 Top Gainers"
-        stocks={topGainers}
-        onStockClick={handleStockClick}
-        onWatchlistToggle={handleWatchlistToggle}
-        watchlist={watchlist}
-      />
-      
-      <StockList
-        title="📉 Top Losers"
-        stocks={topLosers}
-        onStockClick={handleStockClick}
-        onWatchlistToggle={handleWatchlistToggle}
-        watchlist={watchlist}
-      />
+      <div className="hero-section">
+        <h2>Welcome back</h2>
+        <p>Your portfolio</p>
+      </div>
+
+      <div className="trending-section">
+        <h3>Trending</h3>
+        <div className="trending-list">
+          {trendingStocks.map(stock => (
+            <div key={stock.symbol} className="trending-item" onClick={() => handleStockClick(stock)}>
+              <div className="trending-left">
+                <p className="trending-symbol">{stock.symbol}</p>
+                <p className="trending-name">{stock.name}</p>
+              </div>
+              <div className="trending-right">
+                <p className="trending-price">${stock.price.toFixed(2)}</p>
+                <p className={`trending-change ${stock.changeAmount >= 0 ? 'positive' : 'negative'}`}>
+                  {stock.changeAmount >= 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 
-  const renderDetail = () => (
-    <div className="detail-screen">
-      <button className="back-button" onClick={() => setCurrentScreen('home')}>
-        ← Back
-      </button>
-      
-      {detailData && (
-        <>
-          <div className="stock-header">
-            <h2>{selectedStock?.symbol} - {detailData.name}</h2>
-            <button className="watchlist-toggle-detail" onClick={() => handleWatchlistToggle(selectedStock?.symbol)}>
-              {isInWatchlist(selectedStock?.symbol) ? '⭐' : '☆'}
-            </button>
-          </div>
-          
-          <div className="price-display">
-            <p className="price">${selectedStock?.price.toFixed(2)}</p>
-            <p className={`change ${selectedStock?.changeAmount >= 0 ? 'positive' : 'negative'}`}>
-              {selectedStock?.changeAmount >= 0 ? '▲' : '▼'} {Math.abs(selectedStock?.changeAmount).toFixed(2)} ({selectedStock?.changePercent.toFixed(2)}%)
-            </p>
-          </div>
-          
-          {dailyData && <StockChart dailyData={dailyData} symbol={selectedStock?.symbol} />}
-          
-          <div className="metrics-grid">
-            <div className="metric">
-              <span className="label">Day High</span>
-              <span className="value">${selectedStock?.dayHigh.toFixed(2)}</span>
+  const renderSearch = () => (
+    <div className="search-screen">
+      <div className="search-header">
+        <input
+          type="text"
+          placeholder="Search stocks..."
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          className="search-input-large"
+        />
+        <button onClick={handleSearch} className="search-btn">Search</button>
+      </div>
+
+      {searchResults.length > 0 && (
+        <div className="search-results">
+          {searchResults.map(stock => (
+            <div key={stock.symbol} onClick={() => handleStockClick(stock)} className="search-result-item">
+              <p>{stock.symbol}</p>
+              <p className="text-gray">{stock.name}</p>
             </div>
-            <div className="metric">
-              <span className="label">Day Low</span>
-              <span className="value">${selectedStock?.dayLow.toFixed(2)}</span>
-            </div>
-            <div className="metric">
-              <span className="label">Volume</span>
-              <span className="value">{(selectedStock?.volume / 1e6).toFixed(1)}M</span>
-            </div>
-            <div className="metric">
-              <span className="label">P/E Ratio</span>
-              <span className="value">{detailData.peRatio || 'N/A'}</span>
-            </div>
-          </div>
-        </>
+          ))}
+        </div>
       )}
     </div>
   )
 
   const renderWatchlist = () => (
     <div className="watchlist-screen">
-      <button className="back-button" onClick={() => setCurrentScreen('home')}>
-        ← Back
-      </button>
-      
-      <h2>⭐ My Watchlist ({watchlist.length})</h2>
-      
+      <h2>Your Watchlist</h2>
       {watchlist.length === 0 ? (
-        <p className="empty-message">No stocks in your watchlist. Add some!</p>
+        <p className="empty-state">No stocks saved yet</p>
       ) : (
-        <StockList
-          title=""
-          stocks={watchlist.map(item => topGainers.find(g => g.symbol === item.symbol) || topLosers.find(l => l.symbol === item.symbol) || { symbol: item.symbol })}
-          onStockClick={handleStockClick}
-          onWatchlistToggle={handleWatchlistToggle}
-          watchlist={watchlist}
-        />
+        <div className="watchlist-items">
+          {watchlist.map(item => {
+            const stock = trendingStocks.find(s => s.symbol === item.symbol)
+            return stock ? (
+              <div key={item.symbol} onClick={() => handleStockClick(stock)} className="watchlist-item">
+                <p>{stock.symbol}</p>
+                <p>${stock.price.toFixed(2)}</p>
+              </div>
+            ) : null
+          })}
+        </div>
       )}
+    </div>
+  )
+
+  const renderDetail = () => (
+    <div className="detail-screen">
+      <button className="back-btn" onClick={() => setCurrentTab('home')}>← Back</button>
+      
+      {selectedStock && (
+        <>
+          <div className="detail-header">
+            <div>
+              <h2>{selectedStock.symbol}</h2>
+              <p className="detail-price">${selectedStock.price.toFixed(2)}</p>
+            </div>
+            <button 
+              className={`add-btn ${isInWatchlist(selectedStock.symbol) ? 'added' : ''}`}
+              onClick={() => toggleWatchlist(selectedStock.symbol)}
+            >
+              {isInWatchlist(selectedStock.symbol) ? '✓ Added' : '+ Add'}
+            </button>
+          </div>
+
+          <p className={`detail-change ${selectedStock.changeAmount >= 0 ? 'positive' : 'negative'}`}>
+            {selectedStock.changeAmount >= 0 ? '+' : ''}{selectedStock.changePercent.toFixed(2)}% today
+          </p>
+
+          {dailyData && <StockChart dailyData={dailyData} symbol={selectedStock.symbol} />}
+        </>
+      )}
+    </div>
+  )
+
+  const renderAccount = () => (
+    <div className="account-screen">
+      <h2>Account</h2>
+      <div className="account-item">
+        <p>Portfolio Value</p>
+        <p className="account-value">$0.00</p>
+      </div>
+      <div className="account-item">
+        <p>Cash Available</p>
+        <p className="account-value">$0.00</p>
+      </div>
+      <p className="account-note">Sign in to enable real trading</p>
     </div>
   )
 
   return (
     <div className="app">
-      <Header onSearch={handleSearch} onWatchlistClick={() => setCurrentScreen('watchlist')} />
-      
-      {error && <div className="error-message">❌ {error}</div>}
+      {error && <div className="error-banner">❌ {error}</div>}
       
       <main className="main-content">
-        {loading && <div className="loading">Loading...</div>}
+        {loading && <div className="loading-overlay">Loading...</div>}
         
-        {!loading && (
-          <>
-            {currentScreen === 'home' && renderHome()}
-            {currentScreen === 'detail' && renderDetail()}
-            {currentScreen === 'watchlist' && renderWatchlist()}
-          </>
-        )}
+        {currentTab === 'home' && renderHome()}
+        {currentTab === 'search' && renderSearch()}
+        {currentTab === 'watchlist' && renderWatchlist()}
+        {currentTab === 'account' && renderAccount()}
+        {currentTab === 'detail' && renderDetail()}
       </main>
+
+      <BottomNav activeTab={currentTab} onTabChange={setCurrentTab} />
     </div>
   )
 }
