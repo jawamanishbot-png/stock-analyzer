@@ -1,0 +1,29 @@
+.stock-list {
+  margin-bottom: 24px;
+}
+
+.stock-list h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 700;
+}
+
+.stocks-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.empty-state {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .stock-list h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+}

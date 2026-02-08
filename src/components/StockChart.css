@@ -1,0 +1,46 @@
+.chart-container {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.chart-trend {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .chart-header h3 {
+    font-size: 0.9rem;
+  }
+
+  .chart-wrapper {
+    height: 250px;
+  }
+}
