@@ -1,6 +1,6 @@
 .chart-container {
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: #111;
+  border: 1px solid #333;
   border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
@@ -16,7 +16,7 @@
 .chart-header h3 {
   margin: 0;
   font-size: 1rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .chart-trend {

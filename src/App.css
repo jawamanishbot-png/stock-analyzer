@@ -1,9 +1,10 @@
 .app {
   min-height: 100vh;
-  background-color: #ffffff;
+  background-color: #000000;
   display: flex;
   flex-direction: column;
   padding-bottom: 70px;
+  color: #ffffff;
 }
 
 .main-content {
@@ -46,7 +47,7 @@
   margin: 0 0 12px 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
 .trending-list {
@@ -60,13 +61,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #333;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .trending-item:active {
-  background-color: #f8f8f8;
+  background-color: #111;
 }
 
 .trending-left {
@@ -77,13 +78,13 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
 .trending-name {
   margin: 2px 0 0 0;
   font-size: 0.8rem;
-  color: #999;
+  color: #888;
 }
 
 .trending-right {
@@ -94,7 +95,7 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
 .trending-change {
@@ -125,15 +126,21 @@
 .search-input-large {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #333;
   border-radius: 8px;
   font-size: 1rem;
+  background-color: #111;
+  color: #ffffff;
+}
+
+.search-input-large::placeholder {
+  color: #666;
 }
 
 .search-input-large:focus {
   outline: none;
   border-color: #22c55e;
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
 .search-btn {
@@ -158,18 +165,18 @@
 
 .search-result-item {
   padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #333;
   cursor: pointer;
 }
 
 .search-result-item p {
   margin: 0;
   font-weight: 600;
-  color: #333;
+  color: #ffffff;
 }
 
 .text-gray {
-  color: #999 !important;
+  color: #888 !important;
   font-weight: 400 !important;
   font-size: 0.9rem !important;
   margin-top: 4px;
@@ -195,14 +202,14 @@
   display: flex;
   justify-content: space-between;
   padding: 16px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #333;
   cursor: pointer;
 }
 
 .watchlist-item p {
   margin: 0;
   font-weight: 600;
-  color: #333;
+  color: #ffffff;
 }
 
 /* Detail Screen */
@@ -231,14 +238,14 @@
 .detail-header h2 {
   margin: 0;
   font-size: 1.5rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .detail-price {
   margin: 4px 0 0 0;
   font-size: 1.8rem;
   font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
 .add-btn {
@@ -285,25 +292,26 @@
 }
 
 .account-item {
-  background-color: #f8f8f8;
+  background-color: #111;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid #333;
 }
 
 .account-item p {
   margin: 0;
-  color: #666;
+  color: #888;
   font-weight: 500;
 }
 
 .account-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #333 !important;
+  color: #ffffff !important;
 }
 
 .account-note {
@@ -340,7 +348,7 @@
 
 .empty-state {
   text-align: center;
-  color: #999;
+  color: #666;
   padding: 40px 20px;
 }
 
