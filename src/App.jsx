@@ -25,16 +25,40 @@ export default function App() {
 
   const loadTrendingStocks = async () => {
     try {
-      const stocks = [
-        { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 875.50, changeAmount: 25.50, changePercent: 3.00, volume: 42500000 },
-        { symbol: 'MSFT', name: 'Microsoft Corporation', price: 380.90, changeAmount: 11.50, changePercent: 3.11, volume: 28300000 },
-        { symbol: 'AAPL', name: 'Apple Inc.', price: 245.50, changeAmount: 6.00, changePercent: 2.50, volume: 52500000 },
-        { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 156.20, changeAmount: 2.05, changePercent: 1.33, volume: 31400000 },
-        { symbol: 'TSLA', name: 'Tesla Inc.', price: 242.80, changeAmount: -8.50, changePercent: -3.39, volume: 125600000 },
-      ]
+      setLoading(true)
+      const symbols = ['NVDA', 'MSFT', 'AAPL', 'GOOGL', 'TSLA']
+      const nameMap = {
+        'NVDA': 'NVIDIA Corporation',
+        'MSFT': 'Microsoft Corporation',
+        'AAPL': 'Apple Inc.',
+        'GOOGL': 'Alphabet Inc.',
+        'TSLA': 'Tesla Inc.',
+      }
+      
+      const stocks = []
+      for (const symbol of symbols) {
+        try {
+          const quote = await getStockQuote(symbol)
+          stocks.push({
+            symbol: quote.symbol,
+            name: nameMap[symbol],
+            price: quote.price,
+            changeAmount: quote.changeAmount,
+            changePercent: quote.changePercent,
+            volume: quote.volume,
+          })
+          // Add delay between API calls to respect rate limit (5 calls/min)
+          await new Promise(resolve => setTimeout(resolve, 1200))
+        } catch (err) {
+          console.error(`Error fetching ${symbol}:`, err.message)
+        }
+      }
+      
       setTrendingStocks(stocks)
     } catch (err) {
       setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
